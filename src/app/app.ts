@@ -7,6 +7,8 @@ import contactRoutes from "../routes/contact.routes";
 import faqRoutes from "../routes/faq.routes";
 import productRoutes from "../routes/product.routes";
 import newsRoutes from "../routes/news.routes";
+import farmerStoryRoutes from "../routes/farmerStory.routes";
+
 const app = express();
 
 // Middlewares
@@ -29,5 +31,6 @@ app.use("/api/v1/contacts", contactRoutes);
 app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/faq", faqRoutes);
 app.use("/api/v1/news", newsRoutes);
+app.use("/api/v1/stories", farmerStoryRoutes);
 
 export default app;
