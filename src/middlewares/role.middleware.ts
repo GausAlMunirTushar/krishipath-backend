@@ -12,3 +12,28 @@ export const isAdmin = (
 	}
 	next();
 };
+
+export const isAdminOrAgent = (
+	req: AuthRequest,
+	res: Response,
+	next: NextFunction
+): void => {
+	const role = req.user?.role;
+	if (role === "admin" || role === "agent") {
+		next();
+	} else {
+		res.status(403).json({ message: "Admins or Agents only" });
+	}
+};
+
+export const isAgent = (
+	req: AuthRequest,
+	res: Response,
+	next: NextFunction
+): void => {
+	if (req.user?.role !== "agent") {
+		res.status(403).json({ message: "Access denied. Agents only." });
+		return;
+	}
+	next();
+};
