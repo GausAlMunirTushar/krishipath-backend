@@ -4,6 +4,8 @@ import morgan from "morgan";
 import userRoutes from "../routes/user.routes";
 import authRoutes from "../routes/auth.routes";
 import contactRoutes from "../routes/contact.routes";
+import faqRoutes from "../routes/faq.routes";
+import productRoutes from "../routes/product.routes";
 const app = express();
 
 // Middlewares
@@ -23,5 +25,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/contacts", contactRoutes);
+app.use("/api/v1/products", productRoutes);
+app.use("/api/v1/faq", faqRoutes);
 
 export default app;
