@@ -2,6 +2,7 @@
 	"name": "krishipath-backend",
 	"version": "1.0.0",
 	"scripts": {
+		"start": "node src/index.ts",
 		"dev": "ts-node-dev --respawn --transpile-only src/index.ts",
 		"build": "tsc"
 	},

@@ -1,13 +1,17 @@
 {
 	"compilerOptions": {
-		"target": "ES2020",
 		"module": "commonjs",
-		"outDir": "dist",
-		"rootDir": ".",
 		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"strict": true,
-		"skipLibCheck": true
+		"allowSyntheticDefaultImports": true,
+		"target": "ES6",
+		"noImplicitAny": true,
+		"moduleResolution": "node",
+		"sourceMap": true,
+		"outDir": "dist",
+		"baseUrl": ".",
+		"paths": {
+			"*": ["node_modules/*", "src/types/*"]
+		}
 	},
-	"include": ["src", "api"]
+	"include": ["./src/**/*"]
 }
