@@ -10,6 +10,7 @@ import {
 } from "../controllers/farmerStory.controller";
 import { authenticate } from "../middlewares/auth.middleware";
 import { isAdmin } from "../middlewares/role.middleware";
+import { upload } from "../middlewares/upload.middleware";
 
 const router = Router();
 
@@ -17,7 +18,12 @@ const router = Router();
 router.get("/approved", getApprovedStories);
 
 // Farmer
-router.post("/apply", authenticate, submitFarmerStory);
+router.post(
+	"/apply",
+	upload("stories").single("image"),
+	authenticate,
+	submitFarmerStory
+);
 
 // Admin
 router.get("/", authenticate, isAdmin, getAllStories);
