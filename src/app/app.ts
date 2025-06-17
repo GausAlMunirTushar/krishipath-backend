@@ -24,6 +24,21 @@ app.get("/", (req: Request, res: Response) => {
 	});
 });
 
+const whitelist = ["https://krishipath.com", "http://localhost:3000"];
+
+app.use(
+	cors({
+		origin: function (origin, callback) {
+			if (!origin || whitelist.includes(origin)) {
+				callback(null, true);
+			} else {
+				callback(new Error("Not allowed by CORS"));
+			}
+		},
+		credentials: true,
+	})
+);
+
 // Routes
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/auth", authRoutes);
