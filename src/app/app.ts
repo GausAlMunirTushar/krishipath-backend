@@ -12,7 +12,6 @@ import farmerStoryRoutes from "../routes/farmerStory.routes";
 const app = express();
 
 // Middlewares
-app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 
