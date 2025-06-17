@@ -26,7 +26,7 @@ router.post(
 );
 
 // Admin
-router.get("/", authenticate, isAdmin, getAllStories);
+router.get("/", getAllStories);
 router.put("/:id", authenticate, isAdmin, updateStory);
 router.delete("/:id", authenticate, isAdmin, deleteStory);
 router.patch("/:id/approve", authenticate, isAdmin, approveStory);
