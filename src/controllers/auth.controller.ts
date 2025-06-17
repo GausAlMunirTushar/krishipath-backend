@@ -5,12 +5,22 @@ import User from "../models/user.model";
 import { IUser } from "../models/user.model";
 import { generateToken } from "../utils/generateToken";
 
-const JWT_SECRET = process.env.JWT_SECRET!;
+const JWT_SECRET = process.env.JWT_SECRET || "krishipath";
 
 // ✅ Register
 export const register = async (req: Request, res: Response) => {
 	try {
-		const { name, email, phone, password, role } = req.body;
+		const {
+			name,
+			email,
+			phone,
+			password,
+			role,
+			division,
+			district,
+			upazila,
+			address,
+		} = req.body;
 
 		const existingUser = await User.findOne({
 			$or: [{ email }, { phone }],
@@ -27,6 +37,11 @@ export const register = async (req: Request, res: Response) => {
 			phone,
 			password: hashedPassword,
 			role,
+			division,
+			district,
+			upazila,
+			address,
+			avatar: req.file?.path || undefined,
 		});
 		await user.save();
 
@@ -39,35 +54,45 @@ export const register = async (req: Request, res: Response) => {
 // ✅ Login with email or phone
 export const login = async (req: Request, res: Response) => {
 	try {
-		const { loginId, password } = req.body;
+		const { phone, password } = req.body;
 
-		const user = (await User.findOne({
-			$or: [{ email: loginId }, { phone: loginId }],
-		})) as IUser;
+		if (!phone || !password) {
+			return res
+				.status(400)
+				.json({ message: "Phone and password are required." });
+		}
 
-		if (!user)
+		const user = (await User.findOne({ phone })) as IUser | null;
+
+		if (!user) {
 			return res.status(400).json({ message: "Invalid credentials" });
+		}
 
 		const isMatch = await bcrypt.compare(password, user.password);
-		if (!isMatch)
+		if (!isMatch) {
 			return res.status(400).json({ message: "Invalid credentials" });
+		}
 
-		const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, {
-			expiresIn: "7d",
-		});
+		const token = jwt.sign(
+			{ id: user._id.toString(), role: user.role },
+			JWT_SECRET,
+			{ expiresIn: "7d" }
+		);
 
-		res.status(200).json({
+		return res.status(200).json({
 			token,
 			user: {
-				id: user._id,
-				name: user.name,
-				email: user.email,
+				id: user._id.toString(),
 				phone: user.phone,
 				role: user.role,
 			},
 		});
 	} catch (err) {
-		res.status(500).json({ message: "Login failed", error: err });
+		console.error("Login error:", err);
+		return res.status(500).json({
+			message: "Login failed",
+			error: err instanceof Error ? err.message : err,
+		});
 	}
 };
 
@@ -142,12 +167,26 @@ export const getMyProfile = async (req: any, res: Response) => {
 // ✅ Update Profile
 export const updateProfile = async (req: any, res: Response) => {
 	try {
-		const { name, phone, email, password } = req.body;
-		const updateFields: any = {};
+		const {
+			name,
+			phone,
+			email,
+			password,
+			division,
+			district,
+			upazila,
+			address,
+		} = req.body;
+
+		const updateFields: Partial<IUser> = {};
 
 		if (name) updateFields.name = name;
 		if (phone) updateFields.phone = phone;
 		if (email) updateFields.email = email;
+		if (division) updateFields.division = division;
+		if (district) updateFields.district = district;
+		if (upazila) updateFields.upazila = upazila;
+		if (address) updateFields.address = address;
 		if (req.file?.path) updateFields.avatar = req.file.path;
 
 		if (password) {
