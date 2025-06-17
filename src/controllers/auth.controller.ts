@@ -5,7 +5,7 @@ import User from "../models/user.model";
 import { IUser } from "../models/user.model";
 import { generateToken } from "../utils/generateToken";
 
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
+const JWT_SECRET = process.env.JWT_SECRET!;
 
 // ✅ Register
 export const register = async (req: Request, res: Response) => {
@@ -121,5 +121,51 @@ export const resetPassword = async (req: Request, res: Response) => {
 		res.json({ message: "Password reset successful" });
 	} catch (err) {
 		res.status(500).json({ message: "Reset failed", error: err });
+	}
+};
+export const getMyProfile = async (req: any, res: Response) => {
+	try {
+		const user = await User.findById(req.user._id).select(
+			"-password -resetToken -resetTokenExpiry"
+		);
+		if (!user) return res.status(404).json({ message: "User not found" });
+
+		res.status(200).json(user);
+	} catch (err) {
+		res.status(500).json({
+			message: "Failed to fetch profile",
+			error: err,
+		});
+	}
+};
+
+// ✅ Update Profile
+export const updateProfile = async (req: any, res: Response) => {
+	try {
+		const { name, phone, email, password } = req.body;
+		const updateFields: any = {};
+
+		if (name) updateFields.name = name;
+		if (phone) updateFields.phone = phone;
+		if (email) updateFields.email = email;
+		if (req.file?.path) updateFields.avatar = req.file.path;
+
+		if (password) {
+			const hashed = await bcrypt.hash(password, 10);
+			updateFields.password = hashed;
+		}
+
+		const updatedUser = await User.findByIdAndUpdate(
+			req.user._id,
+			updateFields,
+			{
+				new: true,
+				select: "-password -resetToken -resetTokenExpiry",
+			}
+		);
+
+		res.status(200).json({ message: "Profile updated", user: updatedUser });
+	} catch (err) {
+		res.status(500).json({ message: "Update failed", error: err });
 	}
 };
