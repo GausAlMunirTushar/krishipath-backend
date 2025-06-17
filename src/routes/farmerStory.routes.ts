@@ -1,5 +1,5 @@
 // src/routes/farmerStory.routes.ts
-import { Router } from "express";
+import { RequestHandler, Router } from "express";
 import {
 	submitFarmerStory,
 	getAllStories,
@@ -20,9 +20,9 @@ router.get("/approved", getApprovedStories);
 // Farmer
 router.post(
 	"/apply",
-	upload("stories").single("image"),
+	upload("farmer_stories").single("image"),
 	authenticate,
-	submitFarmerStory
+	submitFarmerStory as RequestHandler
 );
 
 // Admin

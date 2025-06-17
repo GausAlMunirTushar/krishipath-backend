@@ -1,14 +1,26 @@
 import { Request, Response } from "express";
 import FarmerStory from "../models/farmerStory.model";
 
-// Farmer submits story
+// Farmer submits story (with image upload)
 export const submitFarmerStory = async (req: any, res: Response) => {
 	try {
+		const { name, address, message, videoUrl } = req.body;
+		const imageUrl = req.file?.path;
+
+		if (!imageUrl) {
+			return res.status(400).json({ message: "Image is required" });
+		}
+
 		const story = await FarmerStory.create({
-			...req.body,
+			name,
+			address,
+			message,
+			imageUrl,
+			videoUrl: videoUrl || null,
 			submittedBy: req.user._id,
 			isApproved: false,
 		});
+
 		res.status(201).json(story);
 	} catch (err) {
 		res.status(500).json({ message: "Failed to submit story", error: err });
@@ -64,13 +76,23 @@ export const approveStory = async (req: Request, res: Response) => {
 };
 
 // Admin: Update story
-export const updateStory = async (req: Request, res: Response) => {
+export const updateStory = async (req: any, res: Response) => {
 	try {
+		const updateData: any = { ...req.body };
+
+		// Optional: support image update
+		if (req.file?.path) {
+			updateData.imageUrl = req.file.path;
+		}
+
 		const updated = await FarmerStory.findByIdAndUpdate(
 			req.params.id,
-			req.body,
-			{ new: true }
+			updateData,
+			{
+				new: true,
+			}
 		);
+
 		res.status(200).json(updated);
 	} catch (err) {
 		res.status(500).json({ message: "Failed to update story", error: err });
